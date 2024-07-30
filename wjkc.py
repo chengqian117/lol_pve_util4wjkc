@@ -5,11 +5,13 @@ import cv2
 import numpy as np
 import pyautogui
 from pynput import keyboard
+from pynput.mouse import Controller, Button
 
 # 加载待匹配的图像模板
 wq_png = cv2.imread('wqk2.png', 0)
 bdk_png = cv2.imread('bdk.png', 0)
 ym_png = cv2.imread('ym.png', 0)
+re_png = cv2.imread('re.png', 0)
 w, h = wq_png.shape[::-1]
 
 
@@ -92,6 +94,31 @@ def find_image_on_screen():
     return representative_points
 
 
+def find_re_image_on_screen():
+
+    global re_png
+    # 截取屏幕
+    screenshot = pyautogui.screenshot()
+    # # 将截图转换为 OpenCV 图像格式
+    # screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+    #
+    # # 显示截屏图像
+    # cv2.imshow('Screenshot', screenshot)
+    #
+    # # 等待用户按键关闭窗口
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+    screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+    gray_screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+
+    threshold = 0.8
+    # 模板匹配
+    result = cv2.matchTemplate(gray_screenshot, re_png, cv2.TM_CCORR_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+    return max_loc
+
+
 positions = {}
 index = -1
 
@@ -120,12 +147,32 @@ def on_press(key):
                 print("No matching images found.")
                 index = -1
         if key == keyboard.Key.space:
-            print("空格")
-            var = positions[index]
-            pyautogui.click(var[0], var[1], button="left")
+            # print("空格")
+            mouse = Controller()
+            mouse.click(Button.left, 1)
             positions = {}
             index = -1
+        if key == keyboard.KeyCode.from_char("b"):
+            # 获取屏幕尺寸
+            screen_width, screen_height = pyautogui.size()
 
+            # 计算目标位置的像素坐标（50%）
+            target_x = screen_width * 0.670
+            target_y = screen_height * 0.920
+
+            pyautogui.moveTo(target_x, target_y)
+            mouse = Controller()
+            mouse.click(Button.left, 1)
+        if key == keyboard.KeyCode.from_char("f"):
+            print("re")
+            max_loc = find_re_image_on_screen()
+
+            if max_loc is not None:
+                print("Found re positions: ", max_loc)
+                var = max_loc
+                pyautogui.moveTo(var[0], var[1])
+            else:
+                print("No re images found.")
     except Exception as e:
         print(f"Error: {e}")
 

@@ -15,13 +15,15 @@ bdk_png = cv2.imread('bdk2.png', 0)
 ym_png = cv2.imread('ym.png', 0)
 w, h = wq_png.shape[::-1]
 test = cv2.imread('test3.png', 0)
+re_png = cv2.imread('re.png', 0)
 
 threshold = 0.8
 
 # result = cv2.matchTemplate(test, wq_png, cv2.TM_CCORR_NORMED)
 # a_list = np.where(result >= 0.76)
 
-result = cv2.matchTemplate(test, bdk_png, cv2.TM_CCORR_NORMED)
+result = cv2.matchTemplate(test, re_png, cv2.TM_CCORR_NORMED)
+min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 b_list = np.where(result >= 0.8)
 
 # result = cv2.matchTemplate(test, ym_png, cv2.TM_CCORR_NORMED)
@@ -63,7 +65,7 @@ positions = []
 #     center = (pt[0] + w // 2, pt[1] + h // 2)
 #     positions.append(center)
 for pt in zip(*b_list[::-1]):
-    center = (pt[0] + w // 2, pt[1] + h // 2)
+    center = (pt[0], pt[1])
     positions.append(center)
 # for pt in zip(*c_list[::-1]):
 #     center = (pt[0] + w // 2, pt[1] + h // 2)
