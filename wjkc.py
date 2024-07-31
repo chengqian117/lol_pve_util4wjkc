@@ -8,12 +8,17 @@ from pynput import keyboard
 from pynput.mouse import Controller, Button
 
 # 加载待匹配的图像模板
-wq_png = cv2.imread('wqk2.png', 0)
-bdk_png = cv2.imread('bdk.png', 0)
-ym_png = cv2.imread('ym.png', 0)
-re_png = cv2.imread('re.png', 0)
+wq_png = cv2.imread('resource/bdk.png', 0)
+bdk_png = cv2.imread('resource/bdk.png', 0)
+ym_png = cv2.imread('resource/ym.png', 0)
+re_png = cv2.imread('resource/re.png', 0)
 w, h = wq_png.shape[::-1]
 
+wq_png_threshold = 0.768
+
+bdk_png_threshold = 0.614
+
+ym_png_threshold=0.8
 
 def find_image_on_screen():
     global wq_png
@@ -34,16 +39,18 @@ def find_image_on_screen():
     screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     gray_screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
 
-    threshold = 0.8
+    global wq_png_threshold
+    global bdk_png_threshold
+    global ym_png_threshold
     # 模板匹配
     result = cv2.matchTemplate(gray_screenshot, wq_png, cv2.TM_CCORR_NORMED)
-    a_list = np.where(result >= threshold)
+    a_list = np.where(result >= wq_png_threshold)
 
     result = cv2.matchTemplate(gray_screenshot, bdk_png, cv2.TM_CCORR_NORMED)
-    b_list = np.where(result >= 0.63)
+    b_list = np.where(result >= bdk_png_threshold)
 
     result = cv2.matchTemplate(gray_screenshot, ym_png, cv2.TM_CCORR_NORMED)
-    c_list = np.where(result >= threshold)
+    c_list = np.where(result >= ym_png_threshold)
 
     positions = []
     for pt in zip(*a_list[::-1]):
@@ -112,12 +119,14 @@ def find_re_image_on_screen():
     screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     gray_screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
 
-    threshold = 0.8
     # 模板匹配
     result = cv2.matchTemplate(gray_screenshot, re_png, cv2.TM_CCORR_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-    return max_loc
 
+    if max_val>=0.99:
+        return max_loc
+    else:
+        return None
 
 positions = {}
 index = -1
@@ -131,10 +140,11 @@ def on_press(key):
     bd_list = {}
     ym_list = {}
     try:
-        if key == keyboard.Key.tab:
+        if key == keyboard.KeyCode.from_char("q"):
             positions = find_image_on_screen()
 
             if len(positions) > 0:
+
                 print("Found positions: ", positions)
                 index = index + 1
                 print(index)
@@ -143,6 +153,22 @@ def on_press(key):
                 var = positions[index]
                 print(var)
                 pyautogui.moveTo(var[0], var[1])
+                # if len(positions) == 1:
+                #     var = positions[0]
+                #     pyautogui.moveTo(var[0], var[1])
+                #     mouse = Controller()
+                #     mouse.click(Button.left, 1)
+                #     positions = {}
+                #     index = -1
+                # else:
+                #     print("Found positions: ", positions)
+                #     index = index + 1
+                #     print(index)
+                #     if index >= len(positions):
+                #         index = 0
+                #     var = positions[index]
+                #     print(var)
+                #     pyautogui.moveTo(var[0], var[1])
             else:
                 print("No matching images found.")
                 index = -1

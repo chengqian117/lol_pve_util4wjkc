@@ -11,20 +11,29 @@ print("你好，世界")
 # pyautogui.click()
 
 wq_png = cv2.imread('wqk2.png', 0)
-bdk_png = cv2.imread('bdk2.png', 0)
+bdk_png = cv2.imread('bdk.png', 0)
 ym_png = cv2.imread('ym.png', 0)
 w, h = wq_png.shape[::-1]
 test = cv2.imread('test3.png', 0)
 re_png = cv2.imread('re.png', 0)
+dd_png = cv2.imread('dd.png', 0)
+jy_png = cv2.imread('jy2.png', 0)
+nu_png = cv2.imread('nu2.png', 0)
+money_png = cv2.imread('money.png', 0)
+ys_png = cv2.imread('ys.png', 0)
+zd_png = cv2.imread('zd.png', 0)
 
-threshold = 0.8
+
+wq_png_threshold = 0.79
+bdk_png_threshold = 0.614
+ym_png_threshold=0.8
 
 # result = cv2.matchTemplate(test, wq_png, cv2.TM_CCORR_NORMED)
 # a_list = np.where(result >= 0.76)
 
-result = cv2.matchTemplate(test, re_png, cv2.TM_CCORR_NORMED)
+result = cv2.matchTemplate(zd_png, bdk_png, cv2.TM_CCORR_NORMED)
 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-b_list = np.where(result >= 0.8)
+b_list = np.where(result >= bdk_png_threshold)
 
 # result = cv2.matchTemplate(test, ym_png, cv2.TM_CCORR_NORMED)
 # c_list = np.where(result >= 0.8)
@@ -114,4 +123,3 @@ representative_points = [(np.mean([p[0] for p in points]), np.mean([p[1] for p i
 #
 
 print(representative_points)
-print(representative_points[0][0])
