@@ -8,17 +8,18 @@ from pynput import keyboard
 from pynput.mouse import Controller, Button
 
 # 加载待匹配的图像模板
-wq_png = cv2.imread('resource/bdk.png', 0)
-bdk_png = cv2.imread('resource/bdk.png', 0)
-ym_png = cv2.imread('resource/ym.png', 0)
+wq_png = cv2.imread('resource/wqk2.png')
+bdk_png = cv2.imread('resource/bdk.png')
+ym_png = cv2.imread('resource/ym.png')
 re_png = cv2.imread('resource/re.png', 0)
-w, h = wq_png.shape[::-1]
+w, h = wq_png.shape[:-1]
 
-wq_png_threshold = 0.768
+wq_png_threshold =0.84
 
-bdk_png_threshold = 0.614
+bdk_png_threshold = 0.84
 
-ym_png_threshold=0.8
+
+ym_png_threshold=0.83
 
 def find_image_on_screen():
     global wq_png
@@ -38,29 +39,34 @@ def find_image_on_screen():
 
     screenshot = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     gray_screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+    imageMainR, imageMainG, imageMainB = cv2.split(screenshot)
+    imageNeedleR, imageNeedleG, imageNeedleB = cv2.split(bdk_png)
+    imageNeedleR2, imageNeedleG2, imageNeedleB2 = cv2.split(wq_png)
+    imageNeedleR3, imageNeedleG3, imageNeedleB3 = cv2.split(ym_png)
+
 
     global wq_png_threshold
     global bdk_png_threshold
     global ym_png_threshold
     # 模板匹配
-    result = cv2.matchTemplate(gray_screenshot, wq_png, cv2.TM_CCORR_NORMED)
+    result = cv2.matchTemplate(imageMainG, imageNeedleG2, cv2.TM_CCORR_NORMED)
     a_list = np.where(result >= wq_png_threshold)
 
-    result = cv2.matchTemplate(gray_screenshot, bdk_png, cv2.TM_CCORR_NORMED)
+    result = cv2.matchTemplate(imageMainR, imageNeedleR, cv2.TM_CCORR_NORMED)
     b_list = np.where(result >= bdk_png_threshold)
 
-    result = cv2.matchTemplate(gray_screenshot, ym_png, cv2.TM_CCORR_NORMED)
+    result = cv2.matchTemplate(imageMainG, imageNeedleG3, cv2.TM_CCORR_NORMED)
     c_list = np.where(result >= ym_png_threshold)
 
     positions = []
     for pt in zip(*a_list[::-1]):
-        center = (pt[0] + w // 2, pt[1] + h // 2)
+        center = (pt[0] + 100, pt[1] +200)
         positions.append(center)
     for pt in zip(*b_list[::-1]):
-        center = (pt[0] + w // 2, pt[1] + h // 2)
+        center = (pt[0] + 100, pt[1] + 200)
         positions.append(center)
     for pt in zip(*c_list[::-1]):
-        center = (pt[0] + w // 2, pt[1] + h // 2)
+        center = (pt[0] + 100, pt[1] + 200)
         positions.append(center)
 
     x_dict = {}
@@ -178,17 +184,18 @@ def on_press(key):
             mouse.click(Button.left, 1)
             positions = {}
             index = -1
-        if key == keyboard.KeyCode.from_char("b"):
-            # 获取屏幕尺寸
-            screen_width, screen_height = pyautogui.size()
-
-            # 计算目标位置的像素坐标（50%）
-            target_x = screen_width * 0.670
-            target_y = screen_height * 0.920
-
-            pyautogui.moveTo(target_x, target_y)
-            mouse = Controller()
-            mouse.click(Button.left, 1)
+        # 2024/8/2 回城bug修复
+        # if key == keyboard.KeyCode.from_char("b"):
+        #     # 获取屏幕尺寸
+        #     screen_width, screen_height = pyautogui.size()
+        #
+        #     # 计算目标位置的像素坐标（50%）
+        #     target_x = screen_width * 0.670
+        #     target_y = screen_height * 0.920
+        #
+        #     pyautogui.moveTo(target_x, target_y)
+        #     mouse = Controller()
+        #     mouse.click(Button.left, 1)
         if key == keyboard.KeyCode.from_char("f"):
             print("re")
             max_loc = find_re_image_on_screen()

@@ -10,18 +10,19 @@ print("你好，世界")
 # pyautogui.rightClick()
 # pyautogui.click()
 
-wq_png = cv2.imread('wqk2.png', 0)
-bdk_png = cv2.imread('bdk.png', 0)
-ym_png = cv2.imread('ym.png', 0)
-w, h = wq_png.shape[::-1]
-test = cv2.imread('test3.png', 0)
-re_png = cv2.imread('re.png', 0)
-dd_png = cv2.imread('dd.png', 0)
-jy_png = cv2.imread('jy2.png', 0)
-nu_png = cv2.imread('nu2.png', 0)
-money_png = cv2.imread('money.png', 0)
-ys_png = cv2.imread('ys.png', 0)
-zd_png = cv2.imread('zd.png', 0)
+wq_png = cv2.imread('wqk2.png')
+w, h = wq_png.shape[:-1]
+bdk_png = cv2.imread('bdk.png')
+ym_png = cv2.imread('ym.png')
+test = cv2.imread('test3.png')
+ym_test = cv2.imread('ym_test.png')
+re_png = cv2.imread('re.png')
+dd_png = cv2.imread('dd.png')
+jy_png = cv2.imread('jy2.png')
+nu_png = cv2.imread('nu2.png')
+money_png = cv2.imread('money.png')
+ys_png = cv2.imread('ys.png')
+zd_png = cv2.imread('zd.png')
 
 
 wq_png_threshold = 0.79
@@ -31,9 +32,12 @@ ym_png_threshold=0.8
 # result = cv2.matchTemplate(test, wq_png, cv2.TM_CCORR_NORMED)
 # a_list = np.where(result >= 0.76)
 
-result = cv2.matchTemplate(zd_png, bdk_png, cv2.TM_CCORR_NORMED)
+imageMainR, imageMainG, imageMainB = cv2.split(ym_test)
+imageNeedleR, imageNeedleG, imageNeedleB = cv2.split(ym_png)
+
+result = cv2.matchTemplate(imageMainG, imageNeedleG, cv2.TM_CCORR_NORMED)
 min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-b_list = np.where(result >= bdk_png_threshold)
+b_list = np.where(result >= 0.83)
 
 # result = cv2.matchTemplate(test, ym_png, cv2.TM_CCORR_NORMED)
 # c_list = np.where(result >= 0.8)
